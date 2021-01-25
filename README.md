@@ -1,5 +1,5 @@
 <code><img width="10%" src="https://www.vectorlogo.zone/logos/python/python-ar21.svg"></code>
-<code><img width="10%" src="https://www.vectorlogo.zone/logos/telegram/telegram-icon.svg"></code>
+<code><img width="10%" src="https://www.vectorlogo.zone/logos/telegram/telegram-ar21.svg"></code>
 <code><img width="10%" src="https://www.vectorlogo.zone/logos/git-scm/git-scm-ar21.svg"></code>
 
 # Telegram Bot

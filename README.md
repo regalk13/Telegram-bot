@@ -1,2 +1,2 @@
-# telegram-bot
+# Telegram-bot
 This is a example of use telegram &amp; telegram.bot API...

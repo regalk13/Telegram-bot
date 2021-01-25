@@ -1,1 +1,9 @@
-{"reminder": {"241501739": {"utc": 1, "reminder": []}, "1417054962": {"utc": 0, "reminder": [{"name": "El pepe", "date": "24/01/2021"}, {"name": "esta", "date": "24/01/2021", "time": "2:20 pm", "id": 36146}, {"name": "lol", "date": "24/01/2021", "time": "2:20 pm", "id": 93630}, {"name": "Matar a borja", "date": "24/01/2021", "time": "2:10 pm", "id": 34406}, {"name": "matar a borja", "date": "24/01/2021", "time": "12:30 pm", "id": 3778}]}, "-1001341151125": {"utc": 0, "reminder": [{"name": "matar a borja"}]}}}
+{
+    "reminder": {
+        "241501739": {
+            "utc": 1,
+            "reminder": [
+            ]
+        }
+    }
+}

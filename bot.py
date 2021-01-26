@@ -8,7 +8,7 @@ import requests
 import json
 import os
 import random
-from random import randit
+from random import randint
 from better_profanity import profanity
 from pycoingecko import CoinGeckoAPI
 
@@ -274,7 +274,9 @@ def help_menu(update, context):
     args = context.args
     name = update.effective_user['first_name']
     logger.info(f"El usuario {user_id} ha puesto el comando help!")
-    context.bot.sendMessage(chat_id=chat_id, parse_mode = "Markdown", text=f"Hola 👋, {name} Estos son mis comandos: \n*💼 Comandos Basicos*\n /help - Muestra este mensaje.\n /start - Da el mensaje de inicio.\n /echo - Repito lo que digas.\n /weather - Te digo la temperatura y el clima del lugar que pidas.\n *🏅 Comandos Para Administradores*\n /add - Agrega palabras a la lista negra. \n /remove - Elimina palabras de la lista negra.\n *🕔 Comandos Remind* \n /remind - Pone un remind o alarma. \n /list - Muestra todos tus reminds pendientes.\n*💸 Crypto comandos*\n/crypto - pon el nombre de la moneda para obtener info.\n/clist - mira la lista de monedas para obtener info.")
+
+    context.bot.sendMessage(chat_id=chat_id, parse_mode = "Markdown", text=f"Hola 👋, {name} Estos son mis comandos: \n*💼 Comandos Basicos*\n /help - Muestra este mensaje.\n /start - Da el mensaje de inicio.\n /echo - Repito lo que digas. \n /random - Te da un número random. \n /weather - Te digo la temperatura y el clima de un lugar. \n*🏅 Comandos Para Administradores*\n /add - Agrega palabras a la lista negra. \n /remove - Elimina palabras de la lista negra.\n *🕔 Comandos Remind* \n /remind - Pone un remind o alarma. \n /list - Muestra todos tus reminds pendientes.\n*💸 Crypto comandos*\n/crypto - pon el nombre de la moneda para obtener info.\n/clist - mira la lista de monedas para obtener info.")
+
 
 # If user is ADMIN
 
@@ -330,6 +332,16 @@ def del_profanity(update, context):
     else:
         bot.sendMessage(chat_id= chat_id, text=f"Lo siento {name} solo los admins pueden ejecutar este mensaje.")
 
+def randoms(update, context):
+    bot = context.bot
+    user_id = update.effective_user['id']
+    args = context.args
+    chat_id = update.message.chat_id
+    name = update.effective_user['first_name']
+    number = random.randint(1, 10)
+    bot.sendMessage(chat_id=chat_id, text=f"Tú número random es: {number}")
+
+
 def crypto_price(update, context):
     bot = context.bot
     user_id = update.effective_user['id']
@@ -381,7 +393,6 @@ def message(update, context):
         update.message.delete()
         context.bot.sendMessage(chat_id= chat_id, text=f"El mensaje de {name} fue eliminado por contener malas palabras...")
         context.bot.sendMessage(chat_id= user_id, text=f"Por favor mejora tu vocabulario o seras expulsado")
-        
     elif word == ['hola']:
         name = update.effective_user['first_name']
         update.message.reply_text(f"Hola {name}, ¿Como estas?")
@@ -404,6 +415,7 @@ def main():
     starter = CommandHandler("start", start)
     add = CommandHandler("add", add_profanity)
     remove = CommandHandler("remove", del_profanity)
+    randomer = CommandHandler("random", randoms)
     crypto = CommandHandler("crypto", crypto_price)
     crypto_list = CommandHandler("clist", crypto_l)
     weather_command = CommandHandler('weather', get_weather)
@@ -439,6 +451,7 @@ def main():
     dp.add_handler(remove)
     dp.add_handler(conv_handler)
     dp.add_handler(echo_system)
+    dp.add_handler(randomer)
     dp.add_handler(help_m)
     dp.add_handler(crypto)
     dp.add_handler(crypto_list)

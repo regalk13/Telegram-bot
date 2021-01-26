@@ -1,3 +1,4 @@
+from weather_scraper import WeatherScraper #I'm importing from my weather_scraper.py file the WeatherScraper class
 import logging
 import telegramcalendar
 from datetime import datetime, timedelta
@@ -273,7 +274,7 @@ def help_menu(update, context):
     args = context.args
     name = update.effective_user['first_name']
     logger.info(f"El usuario {user_id} ha puesto el comando help!")
-    context.bot.sendMessage(chat_id=chat_id, parse_mode = "Markdown", text=f"Hola 👋, {name} Estos son mis comandos: \n*💼 Comandos Basicos*\n /help - Muestra este mensaje.\n /start - Da el mensaje de inicio.\n /echo - Repito lo que digas.\n*🏅 Comandos Para Administradores*\n /add - Agrega palabras a la lista negra. \n /remove - Elimina palabras de la lista negra.\n *🕔 Comandos Remind* \n /remind - Pone un remind o alarma. \n /list - Muestra todos tus reminds pendientes.\n*💸 Crypto comandos*\n/crypto - pon el nombre de la moneda para obtener info.\n/clist - mira la lista de monedas para obtener info.")
+    context.bot.sendMessage(chat_id=chat_id, parse_mode = "Markdown", text=f"Hola 👋, {name} Estos son mis comandos: \n*💼 Comandos Basicos*\n /help - Muestra este mensaje.\n /start - Da el mensaje de inicio.\n /echo - Repito lo que digas.\n /weather - Te digo la temperatura y el clima del lugar que pidas.\n *🏅 Comandos Para Administradores*\n /add - Agrega palabras a la lista negra. \n /remove - Elimina palabras de la lista negra.\n *🕔 Comandos Remind* \n /remind - Pone un remind o alarma. \n /list - Muestra todos tus reminds pendientes.\n*💸 Crypto comandos*\n/crypto - pon el nombre de la moneda para obtener info.\n/clist - mira la lista de monedas para obtener info.")
 
 # If user is ADMIN
 
@@ -386,6 +387,13 @@ def message(update, context):
         update.message.reply_text(f"Hola {name}, ¿Como estas?")
 
 
+def get_weather(update, context):
+    place_arg = ''.join(context.args)
+    chat_id = update.message.chat_id
+    weather = WeatherScraper(place_arg).get_tempetarure_and_weather()
+
+    context.bot.sendMessage(chat_id= chat_id ,text=f'{weather}')
+
 
 def main():
     updater = Updater("TOKEN", use_context=True)
@@ -398,6 +406,7 @@ def main():
     remove = CommandHandler("remove", del_profanity)
     crypto = CommandHandler("crypto", crypto_price)
     crypto_list = CommandHandler("clist", crypto_l)
+    weather_command = CommandHandler('weather', get_weather)
 
     echo_system = CommandHandler("echo", echo)
     help_m = CommandHandler("help", help_menu)
@@ -433,6 +442,7 @@ def main():
     dp.add_handler(help_m)
     dp.add_handler(crypto)
     dp.add_handler(crypto_list)
+    dp.add_handler(weather_command)
     dp.add_handler(conv_handler_utc)
 
     dp.add_handler(badwords)

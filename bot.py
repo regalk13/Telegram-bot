@@ -386,7 +386,7 @@ def message(update, context):
 
 
 def main():
-    updater = Updater("1497930060:AAEp1bo4nsxSZwa91kAc-mKcwh38CtneFaQ", use_context=True)
+    updater = Updater("TOKEN", use_context=True)
 
     dp = updater.dispatcher
 

@@ -16,6 +16,7 @@ Welcome to a multifunctional bot for the telegram application, seeing that it st
 - pycoingecko = 1.4.0
 - python_telegram_bot = 13.1
 - requests = 2.25.0
+- BeautifulSoup = 4.9.3
 - better_profanity = 0.7.0
 
 ### To install Python:

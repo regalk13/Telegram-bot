@@ -1,4 +1,5 @@
 from weather_scraper import WeatherScraper #I'm importing from my weather_scraper.py file the WeatherScraper class
+from wiki_browser import WikiBrowser #I'm importing from my wiki_browser.py file the WikiBrowser class
 import logging
 import telegramcalendar
 from datetime import datetime, timedelta
@@ -275,7 +276,7 @@ def help_menu(update, context):
     name = update.effective_user['first_name']
     logger.info(f"El usuario {user_id} ha puesto el comando help!")
 
-    context.bot.sendMessage(chat_id=chat_id, parse_mode = "Markdown", text=f"Hola 👋, {name} Estos son mis comandos: \n*💼 Comandos Basicos*\n /help - Muestra este mensaje.\n /start - Da el mensaje de inicio.\n /echo - Repito lo que digas. \n /random - Te da un número random. \n /weather - Te digo la temperatura y el clima de un lugar. \n*🏅 Comandos Para Administradores*\n /add - Agrega palabras a la lista negra. \n /remove - Elimina palabras de la lista negra.\n *🕔 Comandos Remind* \n /remind - Pone un remind o alarma. \n /list - Muestra todos tus reminds pendientes.\n*💸 Crypto comandos*\n/crypto - pon el nombre de la moneda para obtener info.\n/clist - mira la lista de monedas para obtener info.")
+    context.bot.sendMessage(chat_id=chat_id, parse_mode = "Markdown", text=f"Hola 👋, {name} Estos son mis comandos: \n*💼 Comandos Basicos*\n /help - Muestra este mensaje.\n /start - Da el mensaje de inicio.\n /echo - Repito lo que digas. \n /random - Te da un número random. \n /weather - Te digo la temperatura y el clima de un lugar.\n /wiki - Te doy el resumen de un articulo de Wikipedia.\n /wklist - Te enseño la lista de lenguajes permitidos para el comando wiki. \n*🏅 Comandos Para Administradores*\n /add - Agrega palabras a la lista negra. \n /remove - Elimina palabras de la lista negra.\n *🕔 Comandos Remind* \n /remind - Pone un remind o alarma. \n /list - Muestra todos tus reminds pendientes.\n*💸 Crypto comandos*\n/crypto - pon el nombre de la moneda para obtener info.\n/clist - mira la lista de monedas para obtener info.")
 
 
 # If user is ADMIN
@@ -406,6 +407,29 @@ def get_weather(update, context):
     context.bot.sendMessage(chat_id= chat_id ,text=f'{weather}')
 
 
+def wiki_search(update, context):
+    
+
+    if context.args[1] == '-': #If user wants to set a lang for example "fr-guido vann rossum"
+        lang_arg = context.args[0].strip()
+        name_arg = ''.join(context.args[2:])
+        browserObj = WikiBrowser(name_arg, lang_arg)
+        context.bot.sendMessage(chat_id= chat_id, text=f'{browserObj.obtain_summary()}')
+    
+    else: #If user doesn't want to set a lang we use the default lang(español) example "javascript"
+        name_arg = ''.join(context.args)
+        browserObj = WikiBrowser(name_arg)
+        context.bot.sendMessage(chat_id= chat_id, text=f'{browserObj.obtain_summary()}')
+
+
+def wiki_lang_list(update, context):
+    lang_list = ('en', 'es', 'ru', 'fr', 'ar') #It's acctually a tuple but idc
+    name = update.effective_user['first_name']
+    context.bot.sendMessage(chat_id= chat_id, text=f'Hola! {name}👋 esta es la lista de lenguajes permitidos:\n {'\n'.join(lang_list)}')
+
+
+
+
 def main():
     updater = Updater("TOKEN", use_context=True)
 
@@ -419,6 +443,8 @@ def main():
     crypto = CommandHandler("crypto", crypto_price)
     crypto_list = CommandHandler("clist", crypto_l)
     weather_command = CommandHandler('weather', get_weather)
+    wiki_command = CommandHandler('wiki', wiki_search)
+    wiki_list = CommandHandler('wklist', wiki_lang_list)
 
     echo_system = CommandHandler("echo", echo)
     help_m = CommandHandler("help", help_menu)
@@ -456,6 +482,8 @@ def main():
     dp.add_handler(crypto)
     dp.add_handler(crypto_list)
     dp.add_handler(weather_command)
+    dp.add_handler(wiki_command)
+    dp.add_handler(wiki_list)
     dp.add_handler(conv_handler_utc)
 
     dp.add_handler(badwords)

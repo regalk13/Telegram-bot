@@ -439,7 +439,7 @@ def message(update, context):
 
 
 def main():
-    updater = Updater("1497930060:AAFK3lLTJkP86YXSae9yv7Yhac3UgPQiksg", use_context=True)
+    updater = Updater("TOKEN", use_context=True)
 
     dp = updater.dispatcher
 

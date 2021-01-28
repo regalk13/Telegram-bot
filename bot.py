@@ -1,7 +1,9 @@
-from weather_scraper import WeatherScraper #I'm importing from my weather_scraper.py file the WeatherScraper class
-from wiki_browser import WikiBrowser #I'm importing from my wiki_browser.py file the WikiBrowser class
+from modules import telegramcalendar
+from modules import weather_scraper
+from modules import wiki_browser
+from modules.weather_scraper import WeatherScraper
+from modules.wiki_browser import WikiBrowser
 import logging
-import telegramcalendar
 from datetime import datetime, timedelta
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, ConversationHandler, CallbackQueryHandler
@@ -27,7 +29,7 @@ UTC_1, UTC_2 = range(2)
 
 def json_editor(user, key, value):
     user = str(user)
-    with open("reminder.json", "r+") as file:
+    with open("data/reminder.json", "r+") as file:
         content = json.load(file)
         if user not in content["reminder"].keys():
             content["reminder"][user] = {"utc": 0, "reminder": []}
@@ -40,7 +42,7 @@ def json_editor(user, key, value):
 
 
 def json_getter(user, ):
-    with open("reminder.json") as file:
+    with open("data/reminder.json") as file:
         content = json.load(file)
         element = content["reminder"][user]["reminder"][0]
         name = element["name"]
@@ -51,7 +53,7 @@ def json_getter(user, ):
 
 
 def json_deleter(user, r_id=None, current=False):
-    with open("reminder.json", "r+") as file:
+    with open("data/reminder.json", "r+") as file:
         content = json.load(file)
         reminder = content["reminder"][user]["reminder"]
         if not current:
@@ -67,7 +69,7 @@ def json_deleter(user, r_id=None, current=False):
 
 
 def json_utc(user, utc=None):
-    with open("reminder.json", "r+") as file:
+    with open("data/reminder.json", "r+") as file:
         content = json.load(file)
         if utc is None:
             return content["reminder"][user]["utc"]
@@ -81,7 +83,7 @@ def json_utc(user, utc=None):
 def all_reminder(update, context):
     reply_keyboard = [["/start", "/list", "/time"]]
     username = str(update.message["chat"]["id"])
-    with open("reminder.json") as file:
+    with open("data/reminder.json") as file:
         content = json.load(file)
         reminder = content["reminder"][username]["reminder"]
         if len(reminder) == 0:
@@ -275,9 +277,7 @@ def help_menu(update, context):
     args = context.args
     name = update.effective_user['first_name']
     logger.info(f"El usuario {user_id} ha puesto el comando help!")
-
-    context.bot.sendMessage(chat_id=chat_id, parse_mode = "Markdown", text=f"Hola 👋, {name} Estos son mis comandos: \n*💼 Comandos Basicos*\n /help - Muestra este mensaje.\n /start - Da el mensaje de inicio.\n /echo - Repito lo que digas. \n /random - Te da un número random. \n /weather - Te digo la temperatura y el clima de un lugar.\n /wiki - Te doy el resumen de un articulo de Wikipedia.\n /wklist - Te enseño la lista de lenguajes permitidos para el comando wiki. \n*🏅 Comandos Para Administradores*\n /add - Agrega palabras a la lista negra. \n /remove - Elimina palabras de la lista negra.\n *🕔 Comandos Remind* \n /remind - Pone un remind o alarma. \n /list - Muestra todos tus reminds pendientes.\n*💸 Crypto comandos*\n/crypto - pon el nombre de la moneda para obtener info.\n/clist - mira la lista de monedas para obtener info.")
-
+    context.bot.sendMessage(chat_id=chat_id, parse_mode = "Markdown", text=f"Hola 👋, {name} Estos son mis comandos: \n*💼 Comandos Basicos*\n /help - Muestra este mensaje.\n /start - Da el mensaje de inicio.\n /echo - Repito lo que digas. \n /random - Te da un número random. \n*🏅 Comandos Para Administradores*\n /add - Agrega palabras a la lista negra. \n /remove - Elimina palabras de la lista negra.\n *🕔 Comandos Remind* \n /remind - Pone un remind o alarma. \n /list - Muestra todos tus reminds pendientes.\n*💸 Crypto comandos*\n/crypto - pon el nombre de la moneda para obtener info.\n/clist - mira la lista de monedas para obtener info.")
 
 # If user is ADMIN
 
@@ -302,7 +302,7 @@ def add_profanity(update, context):
             logger.info(f"{user_id}")
             bot.sendMessage(chat_id= chat_id, text=f"{name} por favor, dame la nueva palabra...")
         else:
-            with open("badwords.txt", "a", encoding="utf-8") as f:
+            with open("data/badwords.txt", "a", encoding="utf-8") as f:
                 f.write("".join([f"{w}\n" for w in args]))
             logger.info(f"{user_id} new bad word..")
             bot.sendMessage(chat_id= chat_id, text=f"{name} palabra agregada a la lista negra.")
@@ -320,10 +320,10 @@ def del_profanity(update, context):
             logger.info(f"{user_id}")
             bot.sendMessage(chat_id= chat_id, text=f"{name} pon la palabra a retirar por favor...")
         else:
-            with open("badwords.txt", "r", encoding="utf-8") as f:
+            with open("data/badwords.txt", "r", encoding="utf-8") as f:
                 stored = [w.strip() for w in f.readlines()]
 
-            with open("badwords.txt", "w", encoding="utf-8") as f:
+            with open("data/badwords.txt", "w", encoding="utf-8") as f:
                 f.write("".join([f"{w}\n" for w in stored if w not in args]))
 
             profanity.load_censor_words_from_file("badwords.txt")
@@ -382,6 +382,44 @@ def crypto_l(update, context):
 
     context.bot.sendMessage(chat_id=chat_id, parse_mode="markdown", text=f"Hola {name}👋, esta es la lista de monedas que tengo info:\n*btc* = Bitcoin.\n*lit* = Litecoin.\n*eth* = Ethereum.")
 
+def get_weather(update, context):
+    place_arg = ''.join(context.args)
+    chat_id = update.message.chat_id
+    weather = WeatherScraper(place_arg).get_tempetarure_and_weather()
+
+    context.bot.sendMessage(chat_id= chat_id ,text=f'{weather}')
+
+def wiki_search(update, context):
+    bot = context.bot
+    user_id = update.effective_user['id']
+    args = context.args
+    chat_id = update.message.chat_id
+    name = update.effective_user['first_name']
+
+    if args[0] == '-': #If user wants to set a lang for example "fr-guido vann rossum"
+        lang_arg = args[1].strip()
+        name_arg = ''.join(context.args[2:])
+        browserObj = WikiBrowser(name_arg, lang_arg)
+        context.bot.sendMessage(chat_id= chat_id, text=f'{browserObj.obtain_summary()}')
+    
+    else: #If user doesn't want to set a lang we use the default lang(español) example "javascript"
+        name_arg = ''.join(context.args)
+        browserObj = WikiBrowser(name_arg)
+        context.bot.sendMessage(chat_id= chat_id, text=f'{browserObj.obtain_summary()}')
+
+
+def wiki_lang_list(update, context):
+    bot = context.bot
+    user_id = update.effective_user['id']
+    args = context.args
+    chat_id = update.message.chat_id
+    name = update.effective_user['first_name']
+    lang_list = ('-en', '-es', '-ru', '-fr', '-ar') #It's acctually a tuple but idc
+    name = update.effective_user['first_name']
+    nl = '\n'
+    context.bot.sendMessage(chat_id= chat_id, text=f"Hola! {name}👋 esta es la lista de lenguajes permitidos:\n{nl.join(lang_list)}")
+
+
 def message(update, context):
     text = update.message.text.lower()
     word = text.split()
@@ -399,39 +437,9 @@ def message(update, context):
         update.message.reply_text(f"Hola {name}, ¿Como estas?")
 
 
-def get_weather(update, context):
-    place_arg = ''.join(context.args)
-    chat_id = update.message.chat_id
-    weather = WeatherScraper(place_arg).get_tempetarure_and_weather()
-
-    context.bot.sendMessage(chat_id= chat_id ,text=f'{weather}')
-
-
-def wiki_search(update, context):
-    
-
-    if context.args[1] == '-': #If user wants to set a lang for example "fr-guido vann rossum"
-        lang_arg = context.args[0].strip()
-        name_arg = ''.join(context.args[2:])
-        browserObj = WikiBrowser(name_arg, lang_arg)
-        context.bot.sendMessage(chat_id= chat_id, text=f'{browserObj.obtain_summary()}')
-    
-    else: #If user doesn't want to set a lang we use the default lang(español) example "javascript"
-        name_arg = ''.join(context.args)
-        browserObj = WikiBrowser(name_arg)
-        context.bot.sendMessage(chat_id= chat_id, text=f'{browserObj.obtain_summary()}')
-
-
-def wiki_lang_list(update, context):
-    lang_list = ('en', 'es', 'ru', 'fr', 'ar') #It's acctually a tuple but idc
-    name = update.effective_user['first_name']
-    context.bot.sendMessage(chat_id= chat_id, text=f'Hola! {name}👋 esta es la lista de lenguajes permitidos:\n {'\n'.join(lang_list)}')
-
-
-
 
 def main():
-    updater = Updater("TOKEN", use_context=True)
+    updater = Updater("1497930060:AAFK3lLTJkP86YXSae9yv7Yhac3UgPQiksg", use_context=True)
 
     dp = updater.dispatcher
 
@@ -445,6 +453,7 @@ def main():
     weather_command = CommandHandler('weather', get_weather)
     wiki_command = CommandHandler('wiki', wiki_search)
     wiki_list = CommandHandler('wklist', wiki_lang_list)
+
 
     echo_system = CommandHandler("echo", echo)
     help_m = CommandHandler("help", help_menu)

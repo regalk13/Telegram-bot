@@ -25,7 +25,7 @@ def separate_callback_data(data):
 
 
 def json_utc(user):
-    with open("reminder.json", "r+") as file:
+    with open("data/reminder.json", "r+") as file:
         content = json.load(file)
         return content["reminder"][user]["utc"]
 

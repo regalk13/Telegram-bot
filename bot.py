@@ -1,6 +1,7 @@
 from modules import telegramcalendar
 from modules import weather_scraper
 from modules import wiki_browser
+#from modules import tech_news_scraper ignore this
 from modules.weather_scraper import WeatherScraper
 from modules.wiki_browser import WikiBrowser
 import logging
@@ -392,17 +393,22 @@ def get_weather(update, context):
 def wiki_search(update, context):
     bot = context.bot
     user_id = update.effective_user['id']
-    args = context.args
+    args = ''.join(context.args)
+    args = args.strip()
     chat_id = update.message.chat_id
     name = update.effective_user['first_name']
 
-    if args[0] == '-': #If user wants to set a lang for example "fr-guido vann rossum"
-        lang_arg = args[1].strip()
-        name_arg = ''.join(context.args[2:])
+    '''the syntax to set a lang is lang:page, for example en:Linux
+        so the first two letters will always be the lang, the third letter will always be a colon and the rest of the string
+        will be the search
+    '''
+    if ':' in args: #So we check if the user's arg contains a colon
+        lang_arg = args[:2] #The first two letters en, ru, fr..... 
+        name_arg = args[3:] #The rest of the sring
         browserObj = WikiBrowser(name_arg, lang_arg)
         context.bot.sendMessage(chat_id= chat_id, text=f'{browserObj.obtain_summary()}')
     
-    else: #If user doesn't want to set a lang we use the default lang(español) example "javascript"
+    else: #If user doesn't want to set a lang the string wont contain a colon.
         name_arg = ''.join(context.args)
         browserObj = WikiBrowser(name_arg)
         context.bot.sendMessage(chat_id= chat_id, text=f'{browserObj.obtain_summary()}')
@@ -419,6 +425,14 @@ def wiki_lang_list(update, context):
     nl = '\n'
     context.bot.sendMessage(chat_id= chat_id, text=f"Hola! {name}👋 esta es la lista de lenguajes permitidos:\n{nl.join(lang_list)}")
 
+''' 
+please ignore this
+def get_news(update, context):
+    bot = context.bot
+    chat_id = update.message.chat_id
+    tittles, links = tech_news_scraper.scrape_news_and_links()
+    context.bot.sendMessage(chat_id= chat_id, text=f'Breaking Tech News!\n{tittles[0]} : {links[0]}\n{tittles[1]} : {links[1]}\n{tittles[2]} : {links[2]} ') #Notice that the tittles and links lenght is 3, i defined it in the scraper.
+'''
 
 def message(update, context):
     text = update.message.text.lower()
@@ -453,7 +467,7 @@ def main():
     weather_command = CommandHandler('weather', get_weather)
     wiki_command = CommandHandler('wiki', wiki_search)
     wiki_list = CommandHandler('wklist', wiki_lang_list)
-
+    news_command = CommandHandler('news', get_news )
 
     echo_system = CommandHandler("echo", echo)
     help_m = CommandHandler("help", help_menu)
@@ -493,6 +507,7 @@ def main():
     dp.add_handler(weather_command)
     dp.add_handler(wiki_command)
     dp.add_handler(wiki_list)
+    dp.add_handler(news_command)
     dp.add_handler(conv_handler_utc)
 
     dp.add_handler(badwords)

@@ -6,7 +6,7 @@
 
 ## About
 
-Welcome to a multifunctional bot for the telegram application, seeing that it started to grow I wanted to make my contribution, it has several super cool functions, such as detecting bad words, looking at the price of crypto currencies, and even reminders can add it to their groups with @regalkbot currently in its Spanish version I hope you like it and can learn.
+Welcome to a multifunctional bot for the telegram application, seeing that it started to grow I wanted to make my contribution, it has several super cool functions, such as detecting bad words, looking at the price of crypto currencies, obtain wikipedia's article summary, and even reminders can add it to their groups with @regalkbot currently in its Spanish version I hope you like it and can learn.
 
 ## Installation of required components
 
@@ -19,6 +19,7 @@ Welcome to a multifunctional bot for the telegram application, seeing that it st
 - BeautifulSoup = 4.9.3
 - better_profanity = 0.7.0
 - wikipedia = 1.4.0 
+- lxml = 4.6.2
 
 ### To install Python:
 

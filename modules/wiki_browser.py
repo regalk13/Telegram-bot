@@ -24,7 +24,7 @@ class WikiBrowser:
         
         except:
 
-            return 'Something went wrong!'
+            return 'Something went wrong :('
 
     
 

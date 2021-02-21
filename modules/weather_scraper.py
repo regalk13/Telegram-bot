@@ -24,7 +24,7 @@ class WeatherScraper:
 		
 		except:
 
-			return 'Something went wrong!'
+                    return 'Something went wrong :('
 
 
 
